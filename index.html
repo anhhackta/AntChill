@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AntChill - Phiên bản Game Việt Nam</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Loading Scene -->
+    <div class="loading-scene" id="loadingScene">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <div class="logo-animation">
+                    <div class="logo-part part-1"></div>
+                    <div class="logo-part part-2"></div>
+                    <div class="logo-part part-3"></div>
+                </div>
+                <div class="loading-text">AntChill</div>
+            </div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <div class="loading-status">Đang tải...</div>
+        </div>
+        <div class="loading-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="hoverSound" preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgBtbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1t//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAYAAAAAAAAABW4=" type="audio/mpeg">
+    </audio>
+    <audio id="clickSound" preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgBtbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1t//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAYAAAAAAAAABW4=" type="audio/mpeg">
+    </audio>
+    <audio id="bgMusic" loop preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAAFbgBtbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1t//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAYAAAAAAAAABW4=" type="audio/mpeg">
+    </audio>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzAwNzJGRiIvPgo8cGF0aCBkPSJNMTIgMTJMMjggMjhNMTIgMjhMMjggMTIiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo=" alt="AntChill Logo" class="logo-img">
+                <span class="logo-text">AntChill</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#home" class="nav-link">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">Về chúng tôi</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#games" class="nav-link">Sản phẩm</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#contact" class="nav-link">Liên hệ</a>
+                </li>
+            </ul>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="themeToggle" title="Chuyển đổi theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="sound-toggle" id="soundToggle" title="Bật/tắt âm thanh">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-badge">
+                    <span class="badge-text">🎮 Game Indie Việt Nam</span>
+                </div>
+                <h1 class="hero-title">
+                    <span class="title-line">AntChill</span>
+                    <span class="title-subtitle">Hãng Game Việt Nam</span>
+                </h1>
+                <p class="hero-description">
+                    Tạo ra những trải nghiệm game độc đáo, mang đậm bản sắc văn hóa Việt Nam. 
+                    Một người, một ước mơ, một sứ mệnh.
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary">
+                        <span class="btn-text">Khám phá ngay</span>
+                        <div class="btn-glow"></div>
+                    </button>
+                    <button class="btn btn-secondary">
+                        <span class="btn-text">Xem demo</span>
+                        <div class="btn-glow"></div>
+                    </button>
+                    <button class="btn btn-download" id="downloadLauncher">
+                        <i class="fas fa-download"></i>
+                        <span class="btn-text">Tải Launcher Game</span>
+                        <div class="btn-glow"></div>
+                    </button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">Người sáng lập</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Khả năng sáng tạo</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Tinh thần Việt</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-character">
+                    <div class="character-body">
+                        <div class="character-head"></div>
+                        <div class="character-torso"></div>
+                        <div class="character-arms"></div>
+                        <div class="character-legs"></div>
+                    </div>
+                    <div class="character-glow"></div>
+                </div>
+                <div class="floating-elements">
+                    <div class="floating-element element-1">🎮</div>
+                    <div class="floating-element element-2">🇻🇳</div>
+                    <div class="floating-element element-3">⚡</div>
+                    <div class="floating-element element-4">🚀</div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-bg">
+            <div class="bg-pattern"></div>
+            <div class="bg-grid"></div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">
+                    <span class="badge-icon">🌟</span>
+                    <span class="badge-text">Về chúng tôi</span>
+                </div>
+                <h2 class="section-title">AntChill</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Một người, một ước mơ</h3>
+                    <p>
+                        AntChill được thành lập bởi một lập trình viên game đam mê với khát khao 
+                        đưa văn hóa Việt Nam đến với thế giới thông qua những sản phẩm game chất lượng cao.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4>Đam mê game</h4>
+                                <p>Niềm đam mê vô tận với nghệ thuật game</p>
+                            </div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-flag"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4>Tinh thần Việt</h4>
+                                <p>Mang văn hóa Việt Nam đến thế giới</p>
+                            </div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4>Đổi mới sáng tạo</h4>
+                                <p>Không ngừng sáng tạo và đổi mới</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-visual">
+                    <div class="vietnam-pattern">
+                        <div class="pattern-element"></div>
+                        <div class="pattern-element"></div>
+                        <div class="pattern-element"></div>
+                    </div>
+                    <div class="about-card">
+                        <div class="card-content">
+                            <h4>Vision</h4>
+                            <p>Trở thành hãng game Việt Nam hàng đầu</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Games Section -->
+    <section id="games" class="games">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">
+                    <span class="badge-icon">🎯</span>
+                    <span class="badge-text">Sản phẩm</span>
+                </div>
+                <h2 class="section-title">Sản phẩm của chúng tôi</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="games-grid">
+                <div class="game-card">
+                    <div class="game-image">
+                        <div class="game-placeholder">🎯</div>
+                        <div class="game-overlay">
+                            <div class="overlay-content">
+                                <span class="overlay-text">Game Đầu Tiên</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-info">
+                        <h3>Game Đầu Tiên</h3>
+                        <p>Trò chơi mang đậm bản sắc văn hóa Việt Nam</p>
+                        <div class="game-tags">
+                            <span class="tag">Action</span>
+                            <span class="tag">Việt Nam</span>
+                        </div>
+                        <div class="game-actions">
+                            <button class="btn btn-play">
+                                <span class="btn-text">Chơi ngay</span>
+                                <div class="btn-glow"></div>
+                            </button>
+                            <button class="btn btn-download-small">
+                                <i class="fas fa-download"></i>
+                                <span class="btn-text">Tải Launcher</span>
+                                <div class="btn-glow"></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="game-card coming-soon">
+                    <div class="game-image">
+                        <div class="game-placeholder">🚧</div>
+                        <div class="game-overlay">
+                            <div class="overlay-content">
+                                <span class="overlay-text">Sắp ra mắt</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-info">
+                        <h3>Sắp ra mắt</h3>
+                        <p>Dự án mới đang trong quá trình phát triển</p>
+                        <div class="game-tags">
+                            <span class="tag">Coming Soon</span>
+                        </div>
+                        <div class="game-actions">
+                            <button class="btn btn-notify" disabled>
+                                <i class="fas fa-bell"></i>
+                                <span class="btn-text">Thông báo khi ra mắt</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="game-card coming-soon">
+                    <div class="game-image">
+                        <div class="game-placeholder">💡</div>
+                        <div class="game-overlay">
+                            <div class="overlay-content">
+                                <span class="overlay-text">Ý tưởng mới</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="game-info">
+                        <h3>Ý tưởng mới</h3>
+                        <p>Đang ấp ủ những ý tưởng độc đáo</p>
+                        <div class="game-tags">
+                            <span class="tag">Concept</span>
+                        </div>
+                        <div class="game-actions">
+                            <button class="btn btn-feedback">
+                                <i class="fas fa-comment"></i>
+                                <span class="btn-text">Góp ý</span>
+                                <div class="btn-glow"></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">
+                    <span class="badge-icon">📞</span>
+                    <span class="badge-text">Liên hệ</span>
+                </div>
+                <h2 class="section-title">Liên hệ</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Hãy kết nối với chúng tôi</h3>
+                    <p>Bạn có ý tưởng hay muốn hợp tác? Hãy để lại tin nhắn!</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <form class="contact-form">
+                    <div class="form-group">
+                        <input type="text" placeholder="Họ và tên" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea placeholder="Tin nhắn của bạn" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Gửi tin nhắn</span>
+                        <div class="btn-glow"></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzAwNzJGRiIvPgo8cGF0aCBkPSJNMTIgMTJMMjggMjhNMTIgMjhMMjggMTIiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo=" alt="AntChill Logo" class="logo-img">
+                    <span class="logo-text">AntChill</span>
+                </div>
+                <p class="footer-text">
+                    © 2024 AntChill. Tất cả quyền được bảo lưu. 
+                    Hãng game Việt Nam - Một người, một ước mơ, một sứ mệnh.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
