@@ -1,666 +1,649 @@
-// Audio Management
-let isSoundEnabled = true;
-let isMusicEnabled = false;
+// AntChill Studio - Premium Gaming Website JavaScript
+class AntChillStudio {
+    constructor() {
+        this.isLoaded = false;
+        this.isSoundEnabled = true;
+        this.currentTheme = 'dark';
+        this.cursor = { x: 0, y: 0 };
+        this.init();
+    }
 
-// Theme Management
-let currentTheme = 'dark';
+    init() {
+        this.setupEventListeners();
+        this.initializeLoading();
+        this.initializeCursor();
+        this.initializeNavigation();
+        this.initializeAnimations();
+        this.initializeAudio();
+        this.initializeTheme();
+        this.initializeForm();
+        console.log('🎮 AntChill Studio initialized!');
+    }
 
-// DOM Elements
-const loadingScene = document.getElementById('loadingScene');
-const themeToggle = document.getElementById('themeToggle');
-const soundToggle = document.getElementById('soundToggle');
-const hoverSound = document.getElementById('hoverSound');
-const clickSound = document.getElementById('clickSound');
-const bgMusic = document.getElementById('bgMusic');
+    setupEventListeners() {
+        document.addEventListener('DOMContentLoaded', () => this.onDOMReady());
+        window.addEventListener('load', () => this.onWindowLoad());
+        window.addEventListener('scroll', () => this.onScroll(), { passive: true });
+        document.addEventListener('mousemove', (e) => this.onMouseMove(e));
+    }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    initializeLoading();
-    initializeTheme();
-    initializeAudio();
-    initializeAnimations();
-    initializeEventListeners();
-});
+    onDOMReady() {
+        this.setupButtonEffects();
+        this.setupCardHovers();
+    }
 
-// Loading Scene
-function initializeLoading() {
-    // Simulate loading progress
-    let progress = 0;
-    const progressBar = document.querySelector('.loading-progress');
-    const statusText = document.querySelector('.loading-status');
-    
-    const loadingInterval = setInterval(() => {
-        progress += Math.random() * 15;
-        if (progress >= 100) {
-            progress = 100;
-            clearInterval(loadingInterval);
-            statusText.textContent = 'Hoàn tất!';
-            
+    onWindowLoad() {
+        this.isLoaded = true;
+        setTimeout(() => this.hideLoading(), 1000);
+    }
+
+    onScroll() {
+        this.updateNavbar();
+    }
+
+    onMouseMove(e) {
+        this.cursor.x = e.clientX;
+        this.cursor.y = e.clientY;
+        this.updateCursor();
+    }
+
+    // Loading Screen
+    initializeLoading() {
+        const progressFill = document.getElementById('loadingProgress');
+        const percentage = document.getElementById('loadingPercentage');
+        const status = document.getElementById('loadingStatus');
+        
+        let progress = 0;
+        const steps = [
+            { progress: 25, status: 'Loading assets...' },
+            { progress: 50, status: 'Initializing engine...' },
+            { progress: 75, status: 'Setting up animations...' },
+            { progress: 100, status: 'Ready to play!' }
+        ];
+        
+        let currentStep = 0;
+        
+        const updateProgress = () => {
+            if (currentStep < steps.length) {
+                const step = steps[currentStep];
+                const targetProgress = step.progress;
+                
+                const animate = () => {
+                    if (progress < targetProgress) {
+                        progress += Math.random() * 4 + 2;
+                        progress = Math.min(progress, targetProgress);
+                        
+                        if (progressFill) progressFill.style.width = `${progress}%`;
+                        if (percentage) percentage.textContent = `${Math.floor(progress)}%`;
+                        if (status) status.textContent = step.status;
+                        
+                        if (progress < targetProgress) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            currentStep++;
+                            setTimeout(updateProgress, 600);
+                        }
+                    }
+                };
+                animate();
+            }
+        };
+        
+        setTimeout(updateProgress, 500);
+    }
+
+    hideLoading() {
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+            loadingScreen.classList.add('hidden');
             setTimeout(() => {
-                loadingScene.classList.add('hidden');
-                document.body.style.overflow = 'visible';
-                startPageAnimations();
-            }, 500);
+                loadingScreen.style.display = 'none';
+                this.startMainAnimations();
+            }, 800);
+        }
+    }
+
+    startMainAnimations() {
+        this.animateCounters();
+        this.initializeScrollAnimations();
+    }
+
+    // Cursor System
+    initializeCursor() {
+        if (window.innerWidth <= 768) return;
+        
+        const follower = document.getElementById('cursorFollower');
+        const dot = document.getElementById('cursorDot');
+        
+        if (follower && dot) {
+            this.cursorFollower = follower;
+            this.cursorDot = dot;
+            this.setupCursorInteractions();
+        }
+    }
+
+    updateCursor() {
+        if (!this.cursorFollower || !this.cursorDot) return;
+        
+        this.cursorDot.style.left = `${this.cursor.x}px`;
+        this.cursorDot.style.top = `${this.cursor.y}px`;
+        
+        this.cursorFollower.style.left = `${this.cursor.x}px`;
+        this.cursorFollower.style.top = `${this.cursor.y}px`;
+    }
+
+    setupCursorInteractions() {
+        const interactiveElements = document.querySelectorAll('a, button, .game-card, .feature-card');
+        
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                if (this.cursorFollower) {
+                    this.cursorFollower.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                    this.cursorFollower.style.opacity = '0.6';
+                }
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                if (this.cursorFollower) {
+                    this.cursorFollower.style.transform = 'translate(-50%, -50%) scale(1)';
+                    this.cursorFollower.style.opacity = '0.3';
+                }
+            });
+        });
+    }
+
+    // Navigation
+    initializeNavigation() {
+        this.setupNavigation();
+        this.setupMobileMenu();
+    }
+
+    setupNavigation() {
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    this.scrollToSection(href.substring(1));
+                    this.updateActiveNavLink(link);
+                    this.playSound('click');
+                }
+            });
+        });
+    }
+
+    setupMobileMenu() {
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        
+        if (menuToggle && navMenu) {
+            menuToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+                this.playSound('click');
+            });
+        }
+    }
+
+    scrollToSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            const offsetTop = section.offsetTop - 80;
+            window.scrollTo({
+                top: offsetTop,
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    updateActiveNavLink(activeLink) {
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        activeLink.classList.add('active');
+    }
+
+    updateNavbar() {
+        const navbar = document.getElementById('navbar');
+        if (navbar) {
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        }
+    }
+
+    // Animations
+    initializeAnimations() {
+        this.setupIntersectionObserver();
+    }
+
+    setupIntersectionObserver() {
+        const animatedElements = document.querySelectorAll('.feature-card, .game-card, .stat-item');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, index * 100);
+                }
+            });
+        }, {
+            threshold: 0.2,
+            rootMargin: '0px 0px -50px 0px'
+        });
+        
+        animatedElements.forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(50px)';
+            element.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            observer.observe(element);
+        });
+    }
+
+    initializeScrollAnimations() {
+        const sections = document.querySelectorAll('section');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const navLink = document.querySelector(`.nav-link[data-section="${entry.target.id}"]`);
+                    if (navLink) {
+                        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                        navLink.classList.add('active');
+                    }
+                }
+            });
+        }, {
+            threshold: 0.3,
+            rootMargin: '-20% 0px -20% 0px'
+        });
+        
+        sections.forEach(section => observer.observe(section));
+    }
+
+    animateCounters() {
+        const counters = document.querySelectorAll('.stat-number[data-count]');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    this.animateCounter(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        counters.forEach(counter => observer.observe(counter));
+    }
+
+    animateCounter(element) {
+        const target = parseInt(element.dataset.count);
+        const duration = 2000;
+        const start = performance.now();
+        
+        const animate = (currentTime) => {
+            const elapsed = currentTime - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+            const current = Math.floor(target * easeOutQuart);
+            
+            element.textContent = current;
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                element.textContent = target;
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    }
+
+    // Button Effects
+    setupButtonEffects() {
+        const buttons = document.querySelectorAll('.btn');
+        
+        buttons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                this.createRippleEffect(e, button);
+                this.playSound('click');
+            });
+            
+            button.addEventListener('mouseenter', () => {
+                this.playSound('hover');
+            });
+        });
+        
+        const downloadButton = document.getElementById('downloadLauncher');
+        if (downloadButton) {
+            downloadButton.addEventListener('click', (e) => {
+                this.handleDownload(e);
+            });
+        }
+    }
+
+    createRippleEffect(event, element) {
+        const rect = element.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = event.clientX - rect.left - size / 2;
+        const y = event.clientY - rect.top - size / 2;
+        
+        const ripple = document.createElement('div');
+        ripple.style.cssText = `
+            position: absolute;
+            width: ${size}px;
+            height: ${size}px;
+            left: ${x}px;
+            top: ${y}px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s ease-out;
+            pointer-events: none;
+        `;
+        
+        element.style.position = 'relative';
+        element.style.overflow = 'hidden';
+        element.appendChild(ripple);
+        
+        setTimeout(() => ripple.remove(), 600);
+    }
+
+    handleDownload(event) {
+        this.showNotification('Đang tải AntChill Launcher...', 'info');
+        
+        setTimeout(() => {
+            this.showNotification('Tải xuống thành công! Kiểm tra thư mục Downloads.', 'success');
+        }, 2000);
+        
+        this.playSound('download');
+    }
+
+    // Card Hover Effects
+    setupCardHovers() {
+        const cards = document.querySelectorAll('.game-card, .feature-card, .contact-method');
+        
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-10px) scale(1.02)';
+                card.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    }
+
+    // Audio System
+    initializeAudio() {
+        this.audioContext = null;
+        this.sounds = new Map();
+        this.setupAudioControls();
+        this.preloadSounds();
+    }
+
+    setupAudioControls() {
+        const soundToggle = document.getElementById('soundToggle');
+        if (soundToggle) {
+            soundToggle.addEventListener('click', () => {
+                this.toggleSound();
+            });
+        }
+    }
+
+    preloadSounds() {
+        if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+            this.audioContext = new (AudioContext || webkitAudioContext)();
+            this.createSounds();
+        }
+    }
+
+    createSounds() {
+        if (!this.audioContext) return;
+        
+        this.sounds.set('click', this.createTone(800, 0.1, 'square'));
+        this.sounds.set('hover', this.createTone(600, 0.05, 'sine'));
+        this.sounds.set('download', this.createTone(1000, 0.3, 'triangle'));
+    }
+
+    createTone(frequency, duration, type = 'sine') {
+        return () => {
+            if (!this.audioContext || !this.isSoundEnabled) return;
+            
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, this.audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+            
+            oscillator.start(this.audioContext.currentTime);
+            oscillator.stop(this.audioContext.currentTime + duration);
+        };
+    }
+
+    playSound(soundName) {
+        const sound = this.sounds.get(soundName);
+        if (sound && this.isSoundEnabled) {
+            try {
+                sound();
+            } catch (error) {
+                console.warn('Audio playback failed:', error);
+            }
+        }
+    }
+
+    toggleSound() {
+        this.isSoundEnabled = !this.isSoundEnabled;
+        const soundToggle = document.getElementById('soundToggle');
+        
+        if (soundToggle) {
+            const icon = soundToggle.querySelector('i');
+            if (icon) {
+                icon.className = this.isSoundEnabled ? 'bi bi-volume-up' : 'bi bi-volume-mute';
+            }
         }
         
-        progressBar.style.width = progress + '%';
+        this.showNotification(
+            this.isSoundEnabled ? 'Âm thanh đã bật' : 'Âm thanh đã tắt',
+            'info'
+        );
+    }
+
+    // Theme System
+    initializeTheme() {
+        const savedTheme = localStorage.getItem('antchill-theme') || 'dark';
+        this.setTheme(savedTheme);
+        this.setupThemeControls();
+    }
+
+    setupThemeControls() {
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                this.toggleTheme();
+            });
+        }
+    }
+
+    setTheme(theme) {
+        this.currentTheme = theme;
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('antchill-theme', theme);
         
-        if (progress < 30) {
-            statusText.textContent = 'Đang tải tài nguyên...';
-        } else if (progress < 60) {
-            statusText.textContent = 'Đang khởi tạo...';
-        } else if (progress < 90) {
-            statusText.textContent = 'Gần xong...';
-        }
-    }, 100);
-}
-
-// Theme Management
-function initializeTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    setTheme(savedTheme);
-}
-
-function setTheme(theme) {
-    currentTheme = theme;
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-    
-    // Update theme toggle icon
-    const icon = themeToggle.querySelector('i');
-    if (theme === 'light') {
-        icon.className = 'fas fa-sun';
-        document.body.style.background = '#ffffff';
-    } else {
-        icon.className = 'fas fa-moon';
-        document.body.style.background = '#0a0a0a';
-    }
-}
-
-function toggleTheme() {
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    playSound('click');
-}
-
-// Audio Management
-function initializeAudio() {
-    // Set initial volume
-    hoverSound.volume = 0.3;
-    clickSound.volume = 0.5;
-    bgMusic.volume = 0.2;
-}
-
-function playSound(type) {
-    if (!isSoundEnabled) return;
-    
-    try {
-        if (type === 'hover') {
-            hoverSound.currentTime = 0;
-            hoverSound.play();
-        } else if (type === 'click') {
-            clickSound.currentTime = 0;
-            clickSound.play();
-        }
-    } catch (error) {
-        console.log('Audio playback failed:', error);
-    }
-}
-
-function toggleSound() {
-    isSoundEnabled = !isSoundEnabled;
-    const icon = soundToggle.querySelector('i');
-    
-    if (isSoundEnabled) {
-        icon.className = 'fas fa-volume-up';
-        icon.style.opacity = '1';
-    } else {
-        icon.className = 'fas fa-volume-mute';
-        icon.style.opacity = '0.5';
-    }
-    
-    playSound('click');
-}
-
-function toggleMusic() {
-    isMusicEnabled = !isMusicEnabled;
-    
-    if (isMusicEnabled) {
-        bgMusic.play().catch(error => {
-            console.log('Background music failed to play:', error);
-        });
-    } else {
-        bgMusic.pause();
-    }
-}
-
-// Animations
-function initializeAnimations() {
-    // Intersection Observer for scroll animations
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            const icon = themeToggle.querySelector('i');
+            if (icon) {
+                icon.className = theme === 'light' ? 'bi bi-sun' : 'bi bi-moon-stars';
             }
-        });
-    }, observerOptions);
-    
-    // Observe elements for animation
-    document.querySelectorAll('.feature, .game-card, .stat-item').forEach(el => {
-        observer.observe(el);
-    });
-}
-
-function startPageAnimations() {
-    // Add entrance animations to elements
-    document.querySelectorAll('.hero-text > *').forEach((el, index) => {
-        el.style.animationDelay = `${index * 0.2}s`;
-    });
-    
-    // Start floating animations
-    document.querySelectorAll('.floating-element').forEach((el, index) => {
-        el.style.animationDelay = `${index * 0.5}s`;
-    });
-}
-
-// Event Listeners
-function initializeEventListeners() {
-    // Theme toggle
-    themeToggle.addEventListener('click', toggleTheme);
-    
-    // Sound toggle
-    soundToggle.addEventListener('click', toggleSound);
-    
-    // Mobile menu
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-    
-    hamburger.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-        hamburger.classList.toggle('active');
-        playSound('click');
-    });
-    
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = link.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-            
-            if (targetSection) {
-                targetSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-            
-            // Close mobile menu if open
-            navMenu.classList.remove('active');
-            hamburger.classList.remove('active');
-            
-            playSound('click');
-        });
-    });
-    
-    // Button hover sounds
-    document.querySelectorAll('.btn').forEach(btn => {
-        btn.addEventListener('mouseenter', () => playSound('hover'));
-        btn.addEventListener('click', () => playSound('click'));
-    });
-    
-    // Download launcher functionality
-    const downloadButtons = document.querySelectorAll('.btn-download, .btn-download-small');
-    downloadButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            showDownloadModal();
-            playSound('click');
-        });
-    });
-    
-    // Form submission
-    const contactForm = document.querySelector('.contact-form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', handleFormSubmit);
+        }
     }
-    
-    // Navbar scroll effect
-    window.addEventListener('scroll', handleNavbarScroll);
-    
-    // Parallax effect
-    window.addEventListener('scroll', handleParallax);
-    
-    // Keyboard shortcuts
-    document.addEventListener('keydown', handleKeyboardShortcuts);
-}
 
-// Navbar scroll effect
-function handleNavbarScroll() {
-    const navbar = document.querySelector('.navbar');
-    if (window.scrollY > 100) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
+    toggleTheme() {
+        const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+        this.setTheme(newTheme);
+        this.playSound('click');
+        
+        this.showNotification(
+            `Đã chuyển sang theme ${newTheme === 'dark' ? 'tối' : 'sáng'}`,
+            'info'
+        );
     }
-}
 
-// Parallax effect
-function handleParallax() {
-    const scrolled = window.pageYOffset;
-    const parallaxElements = document.querySelectorAll('.floating-element, .pattern-element');
-    
-    parallaxElements.forEach((el, index) => {
-        const speed = 0.5 + (index * 0.1);
-        const yPos = -(scrolled * speed);
-        el.style.transform = `translateY(${yPos}px)`;
-    });
-}
+    // Form Handling
+    initializeForm() {
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', (e) => {
+                this.handleFormSubmit(e);
+            });
+        }
+    }
 
-// Form handling
-function handleFormSubmit(e) {
-    e.preventDefault();
-    
-    // Get form data
-    const formData = new FormData(e.target);
-    const name = formData.get('name') || 'Anonymous';
-    const email = formData.get('email') || 'No email';
-    const message = formData.get('message') || 'No message';
-    
-    // Show success message
-    showNotification('Tin nhắn đã được gửi thành công!', 'success');
-    
-    // Reset form
-    e.target.reset();
-    
-    playSound('click');
-}
+    handleFormSubmit(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        this.showNotification('Đang gửi tin nhắn...', 'info');
+        
+        setTimeout(() => {
+            this.showNotification('Tin nhắn đã được gửi thành công!', 'success');
+            form.reset();
+            this.playSound('download');
+        }, 2000);
+    }
 
-// Download Modal
-function showDownloadModal() {
-    const modal = document.createElement('div');
-    modal.className = 'download-modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>🎮 Tải AntChill Launcher</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="download-info">
-                    <div class="system-requirements">
-                        <h4>📋 Yêu cầu hệ thống:</h4>
-                        <ul>
-                            <li>Windows 10/11 (64-bit)</li>
-                            <li>RAM: 4GB trở lên</li>
-                            <li>Dung lượng: 500MB trống</li>
-                            <li>Kết nối internet ổn định</li>
-                        </ul>
-                    </div>
-                    <div class="download-options">
-                        <h4>💾 Tải xuống:</h4>
-                        <div class="download-links">
-                            <a href="#" class="download-link primary" id="downloadWindows">
-                                <i class="fab fa-windows"></i>
-                                Windows 64-bit
-                                <span class="file-size">v1.0.0 (45.2 MB)</span>
-                            </a>
-                            <a href="#" class="download-link secondary" id="downloadZip">
-                                <i class="fas fa-file-archive"></i>
-                                Portable ZIP
-                                <span class="file-size">v1.0.0 (42.8 MB)</span>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="download-steps">
-                        <h4>🚀 Hướng dẫn cài đặt:</h4>
-                        <ol>
-                            <li>Tải file .exe về máy</li>
-                            <li>Chạy file với quyền Administrator</li>
-                            <li>Làm theo hướng dẫn cài đặt</li>
-                            <li>Khởi động launcher và đăng nhập</li>
-                        </ol>
-                    </div>
+    // Notification System
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <div class="notification-icon">
+                    <i class="bi bi-${this.getNotificationIcon(type)}"></i>
                 </div>
+                <div class="notification-message">${message}</div>
+                <button class="notification-close">
+                    <i class="bi bi-x"></i>
+                </button>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeDownloadModal()">Đóng</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Add event listeners
-    const closeBtn = modal.querySelector('.modal-close');
-    const downloadLinks = modal.querySelectorAll('.download-link');
-    
-    closeBtn.addEventListener('click', closeDownloadModal);
-    downloadLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const filename = link.textContent.trim();
-            startDownload(filename, '#');
-        });
-    });
-    
-    // Close on outside click
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeDownloadModal();
-        }
-    });
-    
-    // Add modal styles
-    addModalStyles();
-}
-
-function closeDownloadModal() {
-    const modal = document.querySelector('.download-modal');
-    if (modal) {
-        modal.remove();
-    }
-}
-
-function startDownload(filename, url) {
-    // Simulate download
-    showNotification(`Đang tải ${filename}...`, 'info');
-    
-    setTimeout(() => {
-        showNotification(`${filename} đã được tải xuống!`, 'success');
+        `;
         
-        // Create temporary download link
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        link.click();
-    }, 2000);
-}
-
-function addModalStyles() {
-    if (!document.getElementById('modal-styles')) {
-        const style = document.createElement('style');
-        style.id = 'modal-styles';
-        style.textContent = `
-            .download-modal {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.8);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 10000;
-                animation: fadeIn 0.3s ease;
-            }
-            
-            .modal-content {
-                background: var(--white);
-                border-radius: 24px;
-                max-width: 600px;
-                width: 90%;
-                max-height: 90vh;
-                overflow-y: auto;
-                box-shadow: var(--shadow-xl);
-                animation: slideInUp 0.3s ease;
-                border: 1px solid var(--border-color);
-            }
-            
-            .modal-header {
-                background: var(--gradient-primary);
-                color: var(--white);
-                padding: 1.5rem 2rem;
-                border-radius: 24px 24px 0 0;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            
-            .modal-close {
-                background: none;
-                border: none;
-                color: var(--white);
-                font-size: 2rem;
-                cursor: pointer;
-                padding: 0;
-                width: 30px;
-                height: 30px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 50%;
-                transition: all 0.3s ease;
-            }
-            
-            .modal-body {
-                padding: 2rem;
-            }
-            
-            .download-links {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .download-link {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-                padding: 1rem 1.5rem;
-                border-radius: 16px;
-                text-decoration: none;
-                color: var(--white);
-                font-weight: 600;
-                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                position: relative;
-                overflow: hidden;
-                box-shadow: var(--shadow-primary);
-            }
-            
-            .download-link.primary {
-                background: var(--gradient-primary);
-            }
-            
-            .download-link.secondary {
-                background: var(--gradient-secondary);
-            }
-            
-            .download-link:hover {
-                transform: translateY(-2px);
-                box-shadow: var(--shadow-lg);
-            }
-            
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-            
-            @keyframes slideInUp {
-                from { opacity: 0; transform: translateY(30px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 16px 20px;
+            color: white;
+            z-index: 10000;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         `;
-        document.head.appendChild(style);
-    }
-}
-
-// Notification System
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <span class="notification-message">${message}</span>
-            <button class="notification-close">&times;</button>
-        </div>
-    `;
-    
-    // Add notification styles
-    addNotificationStyles();
-    
-    document.body.appendChild(notification);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        notification.classList.add('fade-out');
-        setTimeout(() => notification.remove(), 300);
-    }, 5000);
-    
-    // Close button
-    const closeBtn = notification.querySelector('.notification-close');
-    closeBtn.addEventListener('click', () => {
-        notification.classList.add('fade-out');
-        setTimeout(() => notification.remove(), 300);
-    });
-}
-
-function addNotificationStyles() {
-    if (!document.getElementById('notification-styles')) {
-        const style = document.createElement('style');
-        style.id = 'notification-styles';
-        style.textContent = `
-            .notification {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: var(--white);
-                border-radius: 12px;
-                box-shadow: var(--shadow-lg);
-                z-index: 10001;
-                animation: slideInRight 0.3s ease;
-                border: 1px solid var(--border-color);
-            }
-            
-            .notification-content {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-                padding: 1rem 1.5rem;
-            }
-            
-            .notification-message {
-                color: var(--text-dark);
-                font-weight: 500;
-            }
-            
-            .notification-close {
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: var(--text-muted);
-                padding: 0;
-                width: 24px;
-                height: 24px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 50%;
-                transition: all 0.2s ease;
-            }
-            
-            .notification-close:hover {
-                background: var(--bg-light);
-                color: var(--text-dark);
-            }
-            
-            .notification-success {
-                border-left: 4px solid var(--accent-color);
-            }
-            
-            .notification-info {
-                border-left: 4px solid var(--primary-color);
-            }
-            
-            .notification.fade-out {
-                animation: slideOutRight 0.3s ease forwards;
-            }
-            
-            @keyframes slideInRight {
-                from { opacity: 0; transform: translateX(100%); }
-                to { opacity: 1; transform: translateX(0); }
-            }
-            
-            @keyframes slideOutRight {
-                from { opacity: 1; transform: translateX(0); }
-                to { opacity: 0; transform: translateX(100%); }
-            }
+        
+        const content = notification.querySelector('.notification-content');
+        content.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 12px;
         `;
-        document.head.appendChild(style);
+        
+        const icon = notification.querySelector('.notification-icon');
+        icon.style.color = this.getNotificationColor(type);
+        
+        const closeBtn = notification.querySelector('.notification-close');
+        closeBtn.style.cssText = `
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            padding: 4px;
+        `;
+        
+        closeBtn.addEventListener('click', () => {
+            this.hideNotification(notification);
+        });
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+        
+        setTimeout(() => {
+            this.hideNotification(notification);
+        }, 5000);
+    }
+
+    hideNotification(notification) {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }
+
+    getNotificationIcon(type) {
+        const icons = {
+            info: 'info-circle',
+            success: 'check-circle',
+            error: 'exclamation-circle',
+            warning: 'exclamation-triangle'
+        };
+        return icons[type] || icons.info;
+    }
+
+    getNotificationColor(type) {
+        const colors = {
+            info: '#3b82f6',
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b'
+        };
+        return colors[type] || colors.info;
     }
 }
 
-// Keyboard shortcuts
-function handleKeyboardShortcuts(e) {
-    // Ctrl/Cmd + T: Toggle theme
-    if ((e.ctrlKey || e.metaKey) && e.key === 't') {
-        e.preventDefault();
-        toggleTheme();
-    }
-    
-    // Ctrl/Cmd + M: Toggle sound
-    if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
-        e.preventDefault();
-        toggleSound();
-    }
-    
-    // Ctrl/Cmd + B: Toggle music
-    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-        e.preventDefault();
-        toggleMusic();
-    }
-    
-    // Escape: Close modal
-    if (e.key === 'Escape') {
-        const modal = document.querySelector('.download-modal');
-        if (modal) {
-            closeDownloadModal();
+// CSS Injection for Dynamic Styles
+const dynamicStyles = `
+    @keyframes ripple {
+        0% {
+            transform: scale(0);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(4);
+            opacity: 0;
         }
     }
-}
+`;
 
-// Performance optimization
-let ticking = false;
+const styleSheet = document.createElement('style');
+styleSheet.textContent = dynamicStyles;
+document.head.appendChild(styleSheet);
 
-function requestTick() {
-    if (!ticking) {
-        requestAnimationFrame(updateAnimations);
-        ticking = true;
-    }
-}
-
-function updateAnimations() {
-    // Update any performance-critical animations here
-    ticking = false;
-}
-
-// Throttle scroll events
-function throttle(func, limit) {
-    let inThrottle;
-    return function() {
-        const args = arguments;
-        const context = this;
-        if (!inThrottle) {
-            func.apply(context, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
-    }
-}
-
-// Apply throttling to scroll events
-window.addEventListener('scroll', throttle(handleNavbarScroll, 16));
-window.addEventListener('scroll', throttle(handleParallax, 16));
-
-// Initialize when page is fully loaded
-window.addEventListener('load', () => {
-    // Add any post-load initialization here
-    console.log('AntChill website loaded successfully! 🎮');
-});
+// Initialize Application
+const antChillStudio = new AntChillStudio();
+window.AntChillStudio = antChillStudio;
